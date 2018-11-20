@@ -1,5 +1,6 @@
 import queue
 import threading
+import re
 
 
 ## wrapper class for a queue of packets
@@ -156,12 +157,49 @@ class Router:
         
     ## Print routing table
     def print_routes(self):
-
-
-
-
-
         
+##        print('%s: routing table' % self)
+##        #TODO: print the routes as a two dimensional table for easy inspection
+##        # Currently the function just prints the route table as a dictionary
+##        columns = list()
+##        for key, value in self.rt_tbl_D.items():
+##            columns.insert(len(columns), key)
+##        print("|======", end="")
+##        for i in range(len(columns)):
+##            print("|======", end="")
+##        print("|")
+##        dest = "| "+self.name+"   |"
+##        for i in columns:
+##            dest += " "+(str(i))+"   |"
+##        print(dest)
+##        print("|======", end="")
+##        for i in range(len(columns)):
+##            print("|======", end="")
+##        print("|")
+##        src = ""
+##        row_keys = set()
+##        for i in set(self.rt_tbl_D.keys()):
+##            row_keys.update(self.rt_tbl_D[i].keys())
+##        for i in row_keys:
+##            src += "| "+str(i)+"   |"
+##            for j in columns:
+##                key1 = self.rt_tbl_D.get(j)
+##                if key1 is not None and i in key1.keys():
+##                    key2 = key1.get(i)
+##                    if key2 is not None:
+##                        src += " "+str(key2)+"    |"
+##                    else:
+##                        src += " ~    |"
+##                else:
+##                    src += " ~    |"
+##            print(src)
+##            src = ""
+##        print("|======", end="")
+##        for i in range(len(columns)):
+##            print("|======", end="")
+##        print("|")
+##        print(self.rt_tbl_D)
+##        print()
         #TODO: print the routes as a two dimensional table
         print(self.rt_tbl_D)
 
@@ -210,11 +248,15 @@ class Router:
     def send_routes(self, i):
         # TODO: Send out a routing table update
 
-
-
+        route =str(self.rt_tbl_D)
+        for item in self.rt_tbl_D:
+            print(item)
+        print("route: "+ str(route))
         
+
+                
         #create a routing table update packet
-        p = NetworkPacket(0, 'control', 'DUMMY_ROUTING_TABLE')
+        p = NetworkPacket(0, 'control', str(route))
         try:
             print('%s: sending routing update "%s" from interface %d' % (self, p, i))
             self.intf_L[i].put(p.to_byte_S(), 'out', True)
@@ -228,6 +270,19 @@ class Router:
     def update_routes(self, p, i):
         #TODO: add logic to update the routing tables and
         # possibly send out routing updates
+        dataIn = p.data_S
+        print("DATA")
+        print(dataIn)
+        dataIn = re.sub('\{|\}|\'|(\s+)','',dataIn)
+        dataIn= re.split(',',dataIn)
+        
+        for item in dataIn:
+            item= re.split('\:',item)
+            if item[0] == self.name:
+                print(item)
+        
+        
+        
         print('%s: Received routing update %s from interface %d' % (self, p, i))
 
                 
