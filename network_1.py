@@ -114,6 +114,7 @@ class Host:
         pkt_S = self.intf_L[0].get('in')
         if pkt_S is not None:
             print('%s: received packet "%s"' % (self, pkt_S))
+            print()
        
     ## thread target for the host to keep receiving data
     def run(self):
@@ -158,48 +159,48 @@ class Router:
     ## Print routing table
     def print_routes(self):
         
-##        print('%s: routing table' % self)
-##        #TODO: print the routes as a two dimensional table for easy inspection
-##        # Currently the function just prints the route table as a dictionary
-##        columns = list()
-##        for key, value in self.rt_tbl_D.items():
-##            columns.insert(len(columns), key)
-##        print("|======", end="")
-##        for i in range(len(columns)):
-##            print("|======", end="")
-##        print("|")
-##        dest = "| "+self.name+"   |"
-##        for i in columns:
-##            dest += " "+(str(i))+"   |"
-##        print(dest)
-##        print("|======", end="")
-##        for i in range(len(columns)):
-##            print("|======", end="")
-##        print("|")
-##        src = ""
-##        row_keys = set()
-##        for i in set(self.rt_tbl_D.keys()):
-##            row_keys.update(self.rt_tbl_D[i].keys())
-##        for i in row_keys:
-##            src += "| "+str(i)+"   |"
-##            for j in columns:
-##                key1 = self.rt_tbl_D.get(j)
-##                if key1 is not None and i in key1.keys():
-##                    key2 = key1.get(i)
-##                    if key2 is not None:
-##                        src += " "+str(key2)+"    |"
-##                    else:
-##                        src += " ~    |"
-##                else:
-##                    src += " ~    |"
-##            print(src)
-##            src = ""
-##        print("|======", end="")
-##        for i in range(len(columns)):
-##            print("|======", end="")
-##        print("|")
-##        print(self.rt_tbl_D)
-##        print()
+        print('%s: routing table' % self)
+        #TODO: print the routes as a two dimensional table for easy inspection
+        # Currently the function just prints the route table as a dictionary
+        columns = list()
+        for key, value in self.rt_tbl_D.items():
+            columns.insert(len(columns), key)
+        print("|======", end="")
+        for i in range(len(columns)):
+            print("|======", end="")
+        print("|")
+        dest = "| "+self.name+"   |"
+        for i in columns:
+            dest += " "+(str(i))+"   |"
+        print(dest)
+        print("|======", end="")
+        for i in range(len(columns)):
+            print("|======", end="")
+        print("|")
+        src = ""
+        row_keys = set()
+        for i in set(self.rt_tbl_D.keys()):
+            row_keys.update(self.rt_tbl_D[i].keys())
+        for i in row_keys:
+            src += "| "+str(i)+"   |"
+            for j in columns:
+                key1 = self.rt_tbl_D.get(j)
+                if key1 is not None and i in key1.keys():
+                    key2 = key1.get(i)
+                    if key2 is not None:
+                        src += " "+str(key2)+"    |"
+                    else:
+                        src += " ~    |"
+                else:
+                    src += " ~    |"
+            print(src)
+            src = ""
+        print("|======", end="")
+        for i in range(len(columns)):
+           print("|======", end="")
+        print("|")
+        print(self.rt_tbl_D)
+        print()
         #TODO: print the routes as a two dimensional table
         print(self.rt_tbl_D)
 
@@ -246,11 +247,13 @@ class Router:
     ## send out route update
     # @param i Interface number on which to send out a routing update
     def send_routes(self, i):
-        # TODO: Send out a routing table update
+        # TODO: See if this works
+
+
 
         route =str(self.rt_tbl_D)
         for item in self.rt_tbl_D:
-            print(item)
+            print("Item:",item)
         print("route: "+ str(route))
         
 
@@ -271,17 +274,35 @@ class Router:
         #TODO: add logic to update the routing tables and
         # possibly send out routing updates
         dataIn = p.data_S
-        print("DATA")
+        print()
+        print("CONTROL DATA in router",self.name)
         print(dataIn)
         dataIn = re.sub('\{|\}|\'|(\s+)','',dataIn)
         dataIn= re.split(',',dataIn)
-        
+        print("DataIn is:",dataIn)
+
+        #Go through the dictionary, and update any route that is less than what we currently have set up
+        #If we end up making a change (and if we don't too?), we want to send out an update to everybody relevant
         for item in dataIn:
             item= re.split('\:',item)
+            print("Item:",item)
             if item[0] == self.name:
-                print(item)
-        
-        
+                print("Item - our name:",item)
+
+
+        #Bellman-ford algorithm:
+          #Predecessor table and current table
+        pre = self.rt_tbl_D
+
+        #Set every connection cost in the route to inf for our table
+            #For every node in set
+        #Set every connection cost in the route to null for pre
+
+
+        #Now we do a for loop through the number of nodes
+        #Now wait for others to return their updated tables. And if they have nodes with shorter length, put them in ours
+
+
         
         print('%s: Received routing update %s from interface %d' % (self, p, i))
 
