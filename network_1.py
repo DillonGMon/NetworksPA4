@@ -281,28 +281,28 @@ class Router:
         dataIn= re.split(',',dataIn)
         print("DataIn is:",dataIn)
 
-        #Go through the dictionary, and update any route that is less than what we currently have set up
-        #If we end up making a change (and if we don't too?), we want to send out an update to everybody relevant
+
+        #Initializing Bellman-ford:
+        #Set all of our known nodes to inf
+        #Set our neighbors distances (which we know)
+        #Send our table to our neighbors
+
         for item in dataIn:
             item= re.split('\:',item)
             print("Item:",item)
             if item[0] == self.name:
-                print("Item - our name:",item)
+                print("Item - with our name:",item)
 
-
+        # If we end up making a change , we want to send out an update to everybody relevant
         #Bellman-ford algorithm:
-          #Predecessor table and current table
-        pre = self.rt_tbl_D
+        while True:
+            #"(wait until I see a link cost change to some neighbor w or until I receive a distance vector from some neighbor w)"
 
-        #Set every connection cost in the route to inf for our table
-            #For every node in set
-        #Set every connection cost in the route to null for pre
+            #Go through whatever we've received and update costs if they're smaller than what we have now
 
+            #If something was changed, then send out our routing table again
 
-        #Now we do a for loop through the number of nodes
-        #Now wait for others to return their updated tables. And if they have nodes with shorter length, put them in ours
-
-
+            break
         
         print('%s: Received routing update %s from interface %d' % (self, p, i))
 
