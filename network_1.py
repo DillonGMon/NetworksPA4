@@ -270,6 +270,7 @@ class Router:
     def update_routes(self, p, i):
         #TODO: add logic to update the routing tables, and add interface functionality
         INF = 99
+        changed = False
 
         print()
         print('%s: Received routing update %s from interface %d' % (self, p, i))
@@ -279,11 +280,20 @@ class Router:
         print("dataIn before split",dataIn[2])
         dataIn = re.sub('\{|\}|\'|(\s+)','',dataIn)
         dataIn= re.split(',',dataIn)
-        print("DataIn is:",dataIn)
+        print("D_Cost is:",self.cost_D)
+        print("Our self table i:,",self.rt_tbl_D)
 
         rtable = self.rt_tbl_D
         #Dictionary of our neighbors (their name as key)
         neighbors = self.cost_D
+
+
+        print("my rtable is",rtable)
+
+        #Initializing Bellman-ford (mostly from book):
+        #Set all of our known nodes to inf
+        #Set up OUR neighbors distances (which we know)
+        #Send our table to our neighbors
 
 
         # Reform the dictionary from the received string so it's workable
@@ -292,50 +302,45 @@ class Router:
             item = re.split('\:', item)
             print("Item:", item)
 
-            #Set all non-neighbor costs to inf
-            if item[0] not in neighbors:
-                rtable[item[0]] = {item[1]: INF}
-
-
-
-
-            #Adding locations we don't have
-            if item[0] not in rtable:
-                rtable[item[0]] = {item[1]:int(item[2])}
-
-            #If we already have this location, see if its value is better than ours
-            elif item[0] in rtable:
-                pass
+            ##Set all non-neighbor costs to inf, neighbors includes this node
+            #if item[0] not in neighbors:
+            #   rtable[item[0]] = {item[1]: INF}
 
             print("rtable is", rtable)
 
             if item[0] == self.name:
                 print("Item - with our name:", item)
 
-        print()
-        print("Somewhat updated table:")
-        self.print_routes()
-
-        #Initializing Bellman-ford:
-        #Set all of our known nodes to inf
-        #Set up OUR neighbors distances (which we know)
-
-        #Send our table to our neighbors
-
-
-
-
         # If we end up making a change , we want to send out an update to everybody relevant
         #Bellman-ford algorithm:
         while True:
             #"(wait until I see a link cost change to some neighbor w or until I receive a distance vector from some neighbor w)"
 
-            #Go through whatever we've received and update costs if they're smaller than what we have now
+
+            # Adding locations we don't have
+            if item[0] not in rtable:
+                rtable[item[0]] = {item[1]: int(item[2])}
+
+            # Go through whatever we've received and update costs if they're smaller than what we have now
+            elif item[0] in rtable:
+                pass
+
+            #Set the cost to ourselves to 0, this part may be nullified if we fill in our neighbors above
+            if item[0] == self.name:
+                # Set our cost to ourselves as 0
+                rtable[self.name][self.name] = 0
+
 
             #If something was changed, then send out our routing table again
+            if changed:
+                #I think this will send it to our neighbors?
+                self.send_routes(i)
 
             break
-        
+
+        print()
+        print("Updated table:")
+        self.print_routes()
 
 
                 
