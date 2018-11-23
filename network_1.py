@@ -3,6 +3,7 @@ import threading
 import re
 
 
+
 ## wrapper class for a queue of packets
 class Interface:
     ## @param maxsize - the maximum size of the queue storing packets
@@ -140,12 +141,10 @@ class Router:
         self.name = name
         #create a list of interfaces
         self.intf_L = [Interface(max_queue_size) for _ in range(len(cost_D))]
-        #save neighbors and interfeces on which we connect to them
+        #save neighbors and interfaces on which we connect to them
         self.cost_D = cost_D    # {neighbor: {interface: cost}}
         
-        
 
-        #TODO: set up the routing table for connected hosts
         self.rt_tbl_D = {}      # {destination: {router: cost}}
         for key, value in cost_D.items():
             for innerKey, innerValue in cost_D[key].items():
@@ -201,8 +200,6 @@ class Router:
         print("|")
         print(self.rt_tbl_D)
         print()
-        #TODO: print the routes as a two dimensional table
-        print(self.rt_tbl_D)
 
 
     ## called when printing the object
@@ -251,15 +248,15 @@ class Router:
 
 
 
-        route =str(self.rt_tbl_D)
+        route = str(self.rt_tbl_D)
         for item in self.rt_tbl_D:
             print("Item:",item)
-        print("route: "+ str(route))
+        print("route: "+ route)
         
 
                 
         #create a routing table update packet
-        p = NetworkPacket(0, 'control', str(route))
+        p = NetworkPacket(0, 'control', route)
         try:
             print('%s: sending routing update "%s" from interface %d' % (self, p, i))
             self.intf_L[i].put(p.to_byte_S(), 'out', True)
@@ -271,27 +268,62 @@ class Router:
     ## forward the packet according to the routing table
     #  @param p Packet containing routing information
     def update_routes(self, p, i):
-        #TODO: add logic to update the routing tables and
+        #TODO: add logic to update the routing tables, and add interface functionality
+        INF = 99
+
+        print()
+        print('%s: Received routing update %s from interface %d' % (self, p, i))
         # possibly send out routing updates
         dataIn = p.data_S
-        print()
         print("CONTROL DATA in router",self.name)
-        print(dataIn)
+        print("dataIn before split",dataIn[2])
         dataIn = re.sub('\{|\}|\'|(\s+)','',dataIn)
         dataIn= re.split(',',dataIn)
         print("DataIn is:",dataIn)
 
+        rtable = self.rt_tbl_D
+        #Dictionary of our neighbors (their name as key)
+        neighbors = self.cost_D
+
+
+        # Reform the dictionary from the received string so it's workable
+        for item in dataIn:
+            #makes item a usable list item[0] is first, each 2 after that are the costs
+            item = re.split('\:', item)
+            print("Item:", item)
+
+            #Set all non-neighbor costs to inf
+            if item[0] not in neighbors:
+                rtable[item[0]] = {item[1]: INF}
+
+
+
+
+            #Adding locations we don't have
+            if item[0] not in rtable:
+                rtable[item[0]] = {item[1]:int(item[2])}
+
+            #If we already have this location, see if its value is better than ours
+            elif item[0] in rtable:
+                pass
+
+            print("rtable is", rtable)
+
+            if item[0] == self.name:
+                print("Item - with our name:", item)
+
+        print()
+        print("Somewhat updated table:")
+        self.print_routes()
 
         #Initializing Bellman-ford:
         #Set all of our known nodes to inf
-        #Set our neighbors distances (which we know)
+        #Set up OUR neighbors distances (which we know)
+
         #Send our table to our neighbors
 
-        for item in dataIn:
-            item= re.split('\:',item)
-            print("Item:",item)
-            if item[0] == self.name:
-                print("Item - with our name:",item)
+
+
 
         # If we end up making a change , we want to send out an update to everybody relevant
         #Bellman-ford algorithm:
@@ -304,7 +336,7 @@ class Router:
 
             break
         
-        print('%s: Received routing update %s from interface %d' % (self, p, i))
+
 
                 
     ## thread target for the host to keep forwarding data
