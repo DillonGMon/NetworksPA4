@@ -267,6 +267,8 @@ class Router:
 
     ## forward the packet according to the routing table
     #  @param p Packet containing routing information
+
+
     def update_routes(self, p, i):
         #TODO: add logic to update the routing tables, and add interface functionality
         INF = 99
@@ -306,6 +308,18 @@ class Router:
             #if item[0] not in neighbors:
             #   rtable[item[0]] = {item[1]: INF}
 
+            if item[0] not in rtable:
+                rtable[item[0]] = {item[1]: int(item[2])}
+
+            # Go through whatever we've received and update costs if they're smaller than what we have now
+            elif item[0] in rtable:
+                pass
+
+            #Set the cost to ourselves to 0, this part may be nullified if we fill in our neighbors above
+            if item[0] == self.name:
+                # Set our cost to ourselves as 0
+                rtable[self.name][self.name] = 0
+
             print("rtable is", rtable)
 
             if item[0] == self.name:
@@ -318,17 +332,17 @@ class Router:
 
 
             # Adding locations we don't have
-            if item[0] not in rtable:
-                rtable[item[0]] = {item[1]: int(item[2])}
-
-            # Go through whatever we've received and update costs if they're smaller than what we have now
-            elif item[0] in rtable:
-                pass
-
-            #Set the cost to ourselves to 0, this part may be nullified if we fill in our neighbors above
-            if item[0] == self.name:
-                # Set our cost to ourselves as 0
-                rtable[self.name][self.name] = 0
+            # if item[0] not in rtable:
+            #     rtable[item[0]] = {item[1]: int(item[2])}
+            #
+            # # Go through whatever we've received and update costs if they're smaller than what we have now
+            # elif item[0] in rtable:
+            #     pass
+            #
+            # #Set the cost to ourselves to 0, this part may be nullified if we fill in our neighbors above
+            # if item[0] == self.name:
+            #     # Set our cost to ourselves as 0
+            #     rtable[self.name][self.name] = 0
 
 
             #If something was changed, then send out our routing table again
