@@ -297,6 +297,9 @@ class Router:
         #Set up OUR neighbors distances (which we know)
         #Send our table to our neighbors
 
+        #Set everything to inf
+
+
 
         # Reform the dictionary from the received string so it's workable
         for item in dataIn:
@@ -313,7 +316,9 @@ class Router:
 
             # Go through whatever we've received and update costs if they're smaller than what we have now
             elif item[0] in rtable:
-                pass
+                if item[2] < rtable[item[0]][item[1]]:
+                    rtable[item[0]] = rtable[item[1]]
+                    pass
 
             #Set the cost to ourselves to 0, this part may be nullified if we fill in our neighbors above
             if item[0] == self.name:
@@ -352,6 +357,7 @@ class Router:
 
             break
 
+        #self.rt_tbl_D = rtable
         print()
         print("Updated table:")
         self.print_routes()
