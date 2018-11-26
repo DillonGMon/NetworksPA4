@@ -152,7 +152,7 @@ class Router:
 
         
         print('%s: Initialized routing table' % self)
-        self.print_routes()
+        #self.print_routes()
     
         
     ## Print routing table
@@ -305,7 +305,9 @@ class Router:
         for item in dataIn:
             #makes item a usable list item[0] is first, each 2 after that are the costs
             item = re.split('\:', item)
-            print("Item:", item)
+           # print("Item:", item)
+            #for thing in item:
+               # print("thing: " +thing)
 
             ##Set all non-neighbor costs to inf, neighbors includes this node
             #if item[0] not in neighbors:
@@ -313,22 +315,26 @@ class Router:
 
             if item[0] not in rtable:
                 rtable[item[0]] = {item[1]: int(item[2])}
+                changed = True
 
             # Go through whatever we've received and update costs if they're smaller than what we have now
             elif item[0] in rtable:
-                if item[2] < rtable[item[0]][item[1]]:
-                    rtable[item[0]] = rtable[item[1]]
+                
+                if len(item)>2 and int(item[2]) < rtable[item[0]][item[1]]:
+                    rtable[item[0]] = {item[1]:int(item[2])}
+                    changed = True
                     pass
 
             #Set the cost to ourselves to 0, this part may be nullified if we fill in our neighbors above
             if item[0] == self.name:
                 # Set our cost to ourselves as 0
                 rtable[self.name][self.name] = 0
+                changed = True
 
             print("rtable is", rtable)
 
-            if item[0] == self.name:
-                print("Item - with our name:", item)
+            #if item[0] == self.name:
+                #print("Item - with our name:", item)
 
         # If we end up making a change , we want to send out an update to everybody relevant
         #Bellman-ford algorithm:
@@ -337,25 +343,27 @@ class Router:
 
 
             # Adding locations we don't have
-            # if item[0] not in rtable:
-            #     rtable[item[0]] = {item[1]: int(item[2])}
+             if item[0] not in rtable:
+                 rtable[item[0]] = {item[1]: int(item[2])}
+                 changed = True
             #
             # # Go through whatever we've received and update costs if they're smaller than what we have now
-            # elif item[0] in rtable:
-            #     pass
+             elif item[0] in rtable:
+                 pass
             #
             # #Set the cost to ourselves to 0, this part may be nullified if we fill in our neighbors above
-            # if item[0] == self.name:
+             if item[0] == self.name:
             #     # Set our cost to ourselves as 0
-            #     rtable[self.name][self.name] = 0
+                 rtable[self.name][self.name] = 0
+                 changed = True
 
 
             #If something was changed, then send out our routing table again
-            if changed:
+             if changed:
                 #I think this will send it to our neighbors?
                 self.send_routes(i)
 
-            break
+             break
 
         #self.rt_tbl_D = rtable
         print()
