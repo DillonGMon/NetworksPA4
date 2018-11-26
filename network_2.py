@@ -222,6 +222,39 @@ class Router:
         try:
             # TODO: Here you will need to implement a lookup into the
             # forwarding table to find the appropriate outgoing interface
+            #Need where we are, and where we are going. Then check our routing table, and look for our interface first.
+            #To do this, we will need to know where we're going
+
+            #OR, we could just try sending it along the interface if there's an option for that interface. If not, lookup
+            outInterface = self.cost_D.values()
+            intfCount = 0
+            outCount = 0
+
+            for entry in self.cost_D:
+                #Gives the interface of each of our neighbors
+                for key in self.cost_D[entry]:
+                    print("Entry",key)
+                    if key == i:
+                        intfCount += 1
+                    outCount += 1
+               # print("entry ",self.cost_D[entry].keys())
+
+            #If we've only got one option with our interface
+            if intfCount == 1:
+                pass
+            #If we've only got one option the way we haven't come
+            elif outCount == 2:
+                pass
+            #Then, if multiple options of our interface, or other interfaces, do the lookup
+            else:
+                pass
+
+            print("forward_packet interface table lookup at our name",outInterface)
+
+            #If there's only one interface, or outgoing option, take it
+            #if
+
+
             # for now we assume the outgoing interface is 1
             self.intf_L[1].put(p.to_byte_S(), 'out', True)
             print('%s: forwarding packet "%s" from interface %d to %d' % \
@@ -311,7 +344,7 @@ class Router:
                 rtable[self.name][self.name] = 0
                 changed = True
 
-            print("rtable is", rtable)
+            #print("rtable is", rtable)
 
             # if item[0] == self.name:
             # print("Item - with our name:", item)
