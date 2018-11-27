@@ -229,6 +229,7 @@ class Router:
             outInterface = self.cost_D.values()
             intfCount = 0
             outCount = 0
+            out = ''
 
             for entry in self.cost_D:
                 #Gives the interface of each of our neighbors
@@ -239,26 +240,48 @@ class Router:
                     outCount += 1
                # print("entry ",self.cost_D[entry].keys())
 
+            print("Forward Packet, out, packet: ",out,p)
+
+
+            packet = p.to_byte_S()
+            dest = packet[3:4]
+            nodeTarget = dest
+            # Do a 1 node search to see if the target is close, and move that way if it is
+            if dest in self.cost_D.keys():
+                out = self.cost_D[dest][1]
             #If we've only got one option with our interface
-            if intfCount == 1:
-                pass
+            elif intfCount == 1:# and #Wasn't the incoming one:
+                out = i
             #If we've only got one option the way we haven't come
             elif outCount == 2:
-                pass
+                #If it's cheaper to send along one neighbor, do that
+                if self.cost_D[0][2] < self.cost_D[1][2]:
+                    out = self.cost_D[0][1]
+                else:
+                    out = self.cost_D[1][1]
+
             #Then, if multiple options of our interface, or other interfaces, do the lookup
             else:
-                pass
+                low = 99
+                #If we have our interfaces to choose from
+                if intfCount > 1:
+                    for key in self.cost_D:
+                        #So long as it shares our interface
+                        if self.cost_D[0] == i:
+                            if self.cost_D[1] < low:
+                                out = self.cost_D[0]
+                #If the only options are other interfaces
+                else:
+                    for key in self.cost_D:
+                        if self.cost_D[1] < low:
+                            out = self.cost_D[0]
 
-            print("forward_packet interface table lookup at our name",outInterface)
-
-            #If there's only one interface, or outgoing option, take it
-            #if
-
+            print('%s: forwarding packet "%s" from interface %d to %d' % (self, p, i, out))
 
             # for now we assume the outgoing interface is 1
-            self.intf_L[1].put(p.to_byte_S(), 'out', True)
-            print('%s: forwarding packet "%s" from interface %d to %d' % \
-                  (self, p, i, 1))
+            self.intf_L[out].put(p.to_byte_S(), 'out', True)
+            # print('%s: forwarding packet "%s" from interface %d to %d' % \
+            #       (self, p, i, 1))
         except queue.Full:
             print('%s: packet "%s" lost on interface %d' % (self, p, i))
             pass
