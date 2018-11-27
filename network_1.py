@@ -329,7 +329,7 @@ class Router:
             if item[0] == self.name:
                 # Set our cost to ourselves as 0
                 rtable[self.name][self.name] = 0
-                changed = True
+                #changed = True
 
             print("rtable is", rtable)
 
