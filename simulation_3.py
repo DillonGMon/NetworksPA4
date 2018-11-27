@@ -18,8 +18,8 @@ if __name__ == '__main__':
     object_L.append(host_2)
     
     #create routers and cost tables for reaching neighbors
-    cost_D = {'H1': {1: 1}, 'RB': {0: 2},'RC':{2:4}} # {neighbor: {interface: cost}}
-    router_a = network.Router(name='RA', 
+    cost_D = {'H1': {1: 9}, 'RB': {0: 1},'RC':{2:4}} # {neighbor: {interface: cost}}
+    router_a = network.Router(name='RA',
                               cost_D = cost_D,
                               max_queue_size=router_queue_size)
     object_L.append(router_a)
@@ -47,12 +47,12 @@ if __name__ == '__main__':
     object_L.append(link_layer)
     
     #add all the links - need to reflect the connectivity in cost_D tables above
-    link_layer.add_link(link.Link(host_1, 0, router_a, 0))
-    link_layer.add_link(link.Link(router_a, 2, router_b, 0))
-    link_layer.add_link(link.Link(router_a, 1, router_c, 0))
-    link_layer.add_link(link.Link(router_c, 1, router_d, 0))
-    link_layer.add_link(link.Link(router_b, 1, router_d, 0))
-    link_layer.add_link(link.Link(router_d, 2, host_2, 0))
+    link_layer.add_link(link.Link(host_1, 0, router_a, 1))
+    link_layer.add_link(link.Link(router_a, 1, router_b, 1))
+    link_layer.add_link(link.Link(router_a, 1, router_c, 1))
+    link_layer.add_link(link.Link(router_c, 1, router_d, 1))
+    link_layer.add_link(link.Link(router_b, 1, router_d, 1))
+    link_layer.add_link(link.Link(router_d, 0, host_2, 0))
     
     
     #start all the objects
@@ -65,7 +65,7 @@ if __name__ == '__main__':
     
     ## compute routing tables
     router_a.send_routes(1) #one update starts the routing process
-    sleep(simulation_time)  #let the tables converge
+    sleep(simulation_time-1)  #let the tables converge
     print("Converged routing tables")
     for obj in object_L:
         if str(type(obj)) == "<class 'network.Router'>":
