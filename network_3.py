@@ -249,9 +249,9 @@ class Router:
                 out = int(str(self.cost_D[dest])[1])
 
             # If we've only got one option with our interface
-            # elif intfCount == 1:
-            #     out = i
-            #     print("coco")
+            elif intfCount == 1:
+                out = i
+                print("coco")
 
             # Then, if multiple options of our interface, or other interfaces, do the lookup
             else:
