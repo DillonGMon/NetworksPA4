@@ -240,25 +240,25 @@ class Router:
 
             # Check if target is within reach and can be directly sent to
             if dest in self.cost_D:
-                print("Banana")
+                #print("Banana")
                 out = int(str(self.cost_D[dest])[1])
 
             # Do a 1 node search to see if the target is close, and move that way if it is
             elif dest in self.cost_D.keys():
-                print("Potato")
+                #print("Potato")
                 out = int(str(self.cost_D[dest])[1])
 
             # If we've only got one option with our interface
             elif intfCount == 1:
                 out = i
-                print("coco")
+                #print("coco")
 
             # Then, if multiple options of our interface, or other interfaces, do the lookup
             else:
                 low = 99
                 # If we have our interfaces to choose from
                 if intfCount > 1:
-                    print("Apple")
+                    #print("Apple")
                     for key in self.cost_D:
                         # So long as it shares our interface
                         # print("custard",int(str(self.cost_D[key])[4]))
@@ -268,12 +268,12 @@ class Router:
 
                 # If the only options are other interfaces
                 else:
-                    print("cookie")
+                    #print("cookie")
                     for key in self.cost_D:
                         if int(str(self.cost_D[key])[4]) < low:
                             out = int(str(self.cost_D[key])[1])
 
-            print("Waffle i and out:",i,"     ",out)
+            #print("Waffle i and out:",i,"     ",out)
 
             print('%s: forwarding packet "%s" from interface %d to %d' % (self, p, i, out))
             print()
