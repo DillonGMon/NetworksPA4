@@ -248,40 +248,38 @@ class Router:
             nodeTarget = dest
             # Do a 1 node search to see if the target is close, and move that way if it is
             if dest in self.cost_D.keys():
-                out = self.cost_D[dest][1]
+                out = int(str(self.cost_D[dest])[1])
             #If we've only got one option with our interface
-            elif intfCount == 1:# and #Wasn't the incoming one:
+            elif intfCount == 1:
                 out = i
-            #If we've only got one option the way we haven't come
-            elif outCount == 2:
-                #If it's cheaper to send along one neighbor, do that
-                if self.cost_D[0][2] < self.cost_D[1][2]:
-                    out = self.cost_D[0][1]
-                else:
-                    out = self.cost_D[1][1]
+                #print("coco")
 
             #Then, if multiple options of our interface, or other interfaces, do the lookup
             else:
                 low = 99
                 #If we have our interfaces to choose from
                 if intfCount > 1:
+
                     for key in self.cost_D:
                         #So long as it shares our interface
-                        if self.cost_D[0] == i:
-                            if self.cost_D[1] < low:
-                                out = self.cost_D[0]
+                        #print("custard",int(str(self.cost_D[key])[4]))
+                        if int(str(self.cost_D[key])[1]) == i:
+                            if int(str(self.cost_D[key])[4]) < low:
+                                out = int(str(self.cost_D[key])[1])
+
                 #If the only options are other interfaces
                 else:
+                    #print("cookie")
                     for key in self.cost_D:
-                        if self.cost_D[1] < low:
-                            out = self.cost_D[0]
+                        if int(str(self.cost_D[key])[4]) < low:
+                            out = int(str(self.cost_D[key])[1])
+
+           # print("Waffle i and out:",i,"     ",out)
 
             print('%s: forwarding packet "%s" from interface %d to %d' % (self, p, i, out))
 
-            # for now we assume the outgoing interface is 1
             self.intf_L[out].put(p.to_byte_S(), 'out', True)
-            # print('%s: forwarding packet "%s" from interface %d to %d' % \
-            #       (self, p, i, 1))
+
         except queue.Full:
             print('%s: packet "%s" lost on interface %d' % (self, p, i))
             pass
@@ -292,13 +290,14 @@ class Router:
         # TODO: See if this works
 
         route = str(self.rt_tbl_D)
-        for item in self.rt_tbl_D:
-            print("Item:", item)
-        print("route: " + route)
+        # for item in self.rt_tbl_D:
+        #     print("Item:", item)
+        # print("route: " + route)
 
         # create a routing table update packet
         p = NetworkPacket(0, 'control', route)
         try:
+            print()
             print('%s: sending routing update "%s" from interface %d' % (self, p, i))
             self.intf_L[i].put(p.to_byte_S(), 'out', True)
         except queue.Full:
@@ -314,14 +313,14 @@ class Router:
         changed = False
 
         print()
-        print('%s: Received routing update %s from interface %d' % (self, p, i))
+        #print('%s: Received routing update %s from interface %d' % (self, p, i))
         # possibly send out routing updates
         dataIn = p.data_S
-        print("CONTROL DATA in router", self.name)
-        print("dataIn before split", dataIn[2])
+        #print("CONTROL DATA in router", self.name)
+        #print("dataIn before split", dataIn[2])
         dataIn = re.sub('\{|\}|\'|(\s+)', '', dataIn)
         dataIn = re.split(',', dataIn)
-        print("D_Cost is:", self.cost_D)
+        #print("D_Cost is:", self.cost_D)
         print("Our self table i:,", self.rt_tbl_D)
 
         rtable = self.rt_tbl_D
