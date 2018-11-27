@@ -220,13 +220,6 @@ class Router:
     #  @param i Incoming interface number for packet p
     def forward_packet(self, p, i):
         try:
-            # TODO: Here you will need to implement a lookup into the
-            # forwarding table to find the appropriate outgoing interface
-            #Need where we are, and where we are going. Then check our routing table, and look for our interface first.
-            #To do this, we will need to know where we're going
-
-            #OR, we could just try sending it along the interface if there's an option for that interface. If not, lookup
-            outInterface = self.cost_D.values()
             intfCount = 0
             outCount = 0
             out = ''
@@ -245,29 +238,29 @@ class Router:
 
             packet = p.to_byte_S()
             dest = packet[3:5]
-            print("Dest is",dest)
+            #print("Dest is",dest)
 
             # Check if target is within reach and can be directly sent to
             if dest in self.cost_D:
-                print("Banana")
+                #print("Banana")
                 out = int(str(self.cost_D[dest])[1])
 
             # Do a 1 node search to see if the target is close, and move that way if it is
             elif dest in self.cost_D.keys():
-                print("Potato")
+                #print("Potato")
                 out = int(str(self.cost_D[dest])[1])
 
             #If we've only got one option with our interface
             elif intfCount == 1:
                 out = i
-                print("coco")
+                #print("coco")
 
             #Then, if multiple options of our interface, or other interfaces, do the lookup
             else:
                 low = 99
                 #If we have our interfaces to choose from
                 if intfCount > 1:
-                    print("Apple")
+                    #print("Apple")
                     for key in self.cost_D:
                         #So long as it shares our interface
                         #print("custard",int(str(self.cost_D[key])[4]))
@@ -277,17 +270,15 @@ class Router:
 
                 #If the only options are other interfaces
                 else:
-                    print("cookie")
+                    #print("cookie")
                     for key in self.cost_D:
                         if int(str(self.cost_D[key])[4]) < low:
                             out = int(str(self.cost_D[key])[1])
 
-            print("Waffle i and out:",i,"     ",out)
+            #print("Waffle i and out:",i,"     ",out)
 
             print('%s: forwarding packet "%s" from interface %d to %d' % (self, p, i, out))
             print()
-
-            print("Out is",out)
 
             self.intf_L[out].put(p.to_byte_S(), 'out', True)
 
