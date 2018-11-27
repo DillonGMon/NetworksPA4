@@ -244,8 +244,8 @@ class Router:
 
 
             packet = p.to_byte_S()
-            dest = packet[3:4]
-
+            dest = packet[3:5]
+            print("Dest is",dest)
 
             # Check if target is within reach and can be directly sent to
             if dest in self.cost_D:
@@ -286,6 +286,8 @@ class Router:
 
             print('%s: forwarding packet "%s" from interface %d to %d' % (self, p, i, out))
             print()
+
+            print("Out is",out)
 
             self.intf_L[out].put(p.to_byte_S(), 'out', True)
 

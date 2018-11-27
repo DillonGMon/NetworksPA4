@@ -244,7 +244,7 @@ class Router:
 
 
             packet = p.to_byte_S()
-            dest = packet[3:4]
+            dest = packet[3:5]
             nodeTarget = dest
             # Do a 1 node search to see if the target is close, and move that way if it is
             if dest in self.cost_D.keys():
